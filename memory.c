@@ -1,8 +1,7 @@
 #include<stdio.h>
 
-
-int bsize[5] = {100,500,200,300,600};
-int psize[5] = {212,417,112,462};
+int bsize[5] = {100,500,200,300,600}; //size of the available blocks
+int psize[5] = {212,417,112,462}; //size of the upcoming processes
 int b[5],p[4];
 void First_fit();
 void Best_fit();
@@ -11,8 +10,7 @@ void Worst_fit();
 
 
 int main()
-{
-	
+{	
 	printf("Memory Partitions\n");
 	printf("=====First_fit()======\n");
 	First_fit();
@@ -27,7 +25,7 @@ int main()
 
 void First_fit()
 {
-	int flags[5], allocation[5], i, j, frag[4];
+	int flags[5], allocation[5], i, j;
  
 	for(i = 0; i < 5; i++)
 	{
@@ -61,31 +59,34 @@ void First_fit()
 
 void Best_fit()
 {
-	int i,j,lowest, frag[4],temp;
-	for(i=0;i<4;i++)
+	int flags[5], allocation[5], i, j;
+	for(int i=0;i<5;i++)
 	{
-		for(j=0;j<5;j++)
+		for(int j=0;j<5;j++)
 		{
-			if(bsize[j]!=1)
+			if(bsize[j]>bsize[i])
 			{
-				temp=b[j]-p[i];
-				if(temp>=0)
-					if(lowest>temp)
-					{
-						psize[i]=j;
-						lowest=temp;
-					}
+				int t = bsize[i];
+				bsize[i] = bsize[j];
+				bsize[j] = t;
 			}
 		}
-		
-		frag[i]=lowest;
-		bsize[psize[i]]=1;
-		lowest=10000;
 	}
-	
-	/*printf("\nProcess_no\tProcess_size\tBlock_no\tBlock_size\tFragment");
-	for(i=0;i<4 && psize[i]!=0;i++)
-	printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d",i,p[i],psize[i],b[psize[i]],frag[i]);*/
+	for(i = 0; i < 5; i++)
+	{
+		flags[i] = 0;
+		allocation[i] = -1;
+	}
+
+	for(i = 0; i < 4; i++)         //allocation as per best fit
+		for(j = 0; j < 5; j++)
+			if(flags[j] == 0 && bsize[j] >= psize[i])
+			{
+				allocation[j] = i;
+				flags[j] = 1;
+				break;
+			}
+	//display allocation details
 	printf("\nBlock no.\tsize\t\tprocess no.\t\tsize");
 	for(i = 0; i < 5; i++)
 	{
@@ -95,37 +96,41 @@ void Best_fit()
 		else
 			printf("Not allocated");
 	}
+	
 }
 
 
 
 void Worst_fit()
 {
-	int frag[4],i,j,temp,highest=0;
- 	printf("\n\tMemory Management Scheme - Worst Fit");
+	int flags[5], allocation[5], i, j;
+	for(int i=0;i<5;i++)
+	{
+		for(int j=0;j<5;j++)
+		{
+			if(bsize[j]<bsize[i])
+			{
+				int t = bsize[i];
+				bsize[i] = bsize[j];
+				bsize[j] = t;
+			}
+		}
+	}
+	for(i = 0; i < 5; i++)
+	{
+		flags[i] = 0;
+		allocation[i] = -1;
+	}
 
- 	for(i=0;i<4;i++)
- 	{
-  		for(j=0;j<5;j++)
-  		{
-   			if(b[j]!=1)    //if bf[j] is not allocated
-   			{
-    				temp=bsize[j]-psize[i];
-    				if(temp>=0)
-    				if(highest<temp)
-    				{
-     					p[i]=j;
-     					highest=temp;
-    				}
-   			}
-  		}
-  	frag[i]=highest;
-  	b[p[i]]=1;
-  	highest=0;
- 	}
- 	/*printf("\nFile_no:\tProcess_size :\tBlock_no:\tBlock_size:\tFragement");
- 	for(i=0;i<4;i++)
- 	printf("\n%d\t\t%d\t\t%d\t\t%d\t\t%d",i,psize[i],p[i],b[p[i]],frag[i]);*/
+	for(i = 0; i < 4; i++)         //allocation as per worst fit
+		for(j = 0; j < 5; j++)
+			if(flags[j] == 0 && bsize[j] >= psize[i])
+			{
+				allocation[j] = i;
+				flags[j] = 1;
+				break;
+			}
+	//display allocation details
 	printf("\nBlock no.\tsize\t\tprocess no.\t\tsize");
 	for(i = 0; i < 5; i++)
 	{
@@ -135,6 +140,7 @@ void Worst_fit()
 		else
 			printf("Not allocated");
 	}
+	
 }
 
 
